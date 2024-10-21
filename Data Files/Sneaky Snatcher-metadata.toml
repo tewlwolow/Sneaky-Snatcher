@@ -1,0 +1,22 @@
+[package]
+name = "Sneaky Snatcher"
+description = "A MWSE mod to enhance Sneak skill when successfully snatching stuff from containers."
+homepage = "https://www.nexusmods.com/morrowind/mods/"
+repository = "https://github.com/tewlwolow/Sneaky-Snatcher"
+authors = ["tewlwolow"]
+version = "0.0.1"
+
+[tools.mwse]
+lua-mod = "tew.Sneaky Snatcher"
+wait-until-initialize = false
+
+[dependencies]
+assets = [
+	"Textures\\tew\\Sneaky Snatcher",
+]
+
+[dependencies.mwse]
+buildnumber = 3150
+
+[dependencies.mge-xe]
+version = ">=0.15.0"

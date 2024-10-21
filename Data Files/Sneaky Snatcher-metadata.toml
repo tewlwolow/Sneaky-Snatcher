@@ -4,7 +4,7 @@ description = "A MWSE mod to enhance Sneak skill when successfully snatching stu
 homepage = "https://www.nexusmods.com/morrowind/mods/"
 repository = "https://github.com/tewlwolow/Sneaky-Snatcher"
 authors = ["tewlwolow"]
-version = "0.0.1"
+version = "1.0.0"
 
 [tools.mwse]
 lua-mod = "tew.Sneaky Snatcher"

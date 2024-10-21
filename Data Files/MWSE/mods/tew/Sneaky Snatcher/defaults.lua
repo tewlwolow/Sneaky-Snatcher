@@ -1,3 +1,3 @@
 return {
-    sneakSkillIncrease = 100,
+    sneakSkillIncrease = 2,
 }

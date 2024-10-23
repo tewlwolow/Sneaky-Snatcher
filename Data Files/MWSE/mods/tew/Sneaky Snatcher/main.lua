@@ -8,10 +8,6 @@ local playerDetected
 ---@type number
 local lastChecked = 0
 
--- Flag for whether the container has been accessed
----@type boolean
-local accessed = true
-
 -- A table to track references (yes, again and again)
 ---@type tes3reference[]
 local refs = {}

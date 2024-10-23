@@ -11,7 +11,7 @@ A MWSE mod to advance Sneak skill when successfully snatching stuff from contain
 <!-- Main -->
 # Sneaky-Snatcher
 
-The source code and assets repository for a Morrowind MWSE-Lua based mod that advances Sneak skill when successfully snatching stuff from containers.
+The source code and assets repository for a Morrowind MWSE-Lua based mod that advances Sneak skill when successfully snatching (activating) objects when sneaking undetected.
 
 <!-- Links -->
 ## :link: Links

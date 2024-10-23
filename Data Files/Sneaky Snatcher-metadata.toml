@@ -1,6 +1,6 @@
 [package]
 name = "Sneaky Snatcher"
-description = "A MWSE mod to enhance Sneak skill when successfully snatching stuff from containers."
+description = "A MWSE mod to advance Sneak skill when successfully snatching (activating) objects when sneaking undetected."
 homepage = "https://www.nexusmods.com/morrowind/mods/55369"
 repository = "https://github.com/tewlwolow/Sneaky-Snatcher"
 authors = ["tewlwolow"]

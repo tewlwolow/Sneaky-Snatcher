@@ -28,8 +28,5 @@ mainPage:createSlider {
     variable = registerVariable("sneakSkillIncrease"),
 }
 
-template.onClose = function()
-    mwse.saveConfig(configPath, config)
-    dofile("Data Files\\MWSE\\mods\\tew\\Sneaky Snatcher\\components\\events.lua")
-end
+template:saveOnClose(configPath, config)
 mwse.mcm.register(template)

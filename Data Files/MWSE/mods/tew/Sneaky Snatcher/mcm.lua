@@ -25,7 +25,7 @@ mainPage:createYesNoButton {
 }
 
 mainPage:createSlider {
-    label = string.format("Controls sneak skill increase on a successful snatch for containers.\nDefault - %s\nSkill increase for containers", defaults.sneakSkillIncreaseContainer),
+    label = string.format("Controls Sneak skill increase (progress percentage) on a successful snatch for containers.\nDefault - %s\nSkill increase for containers", defaults.sneakSkillIncreaseContainer),
     min = 0,
     max = 100,
     step = 1,
@@ -34,7 +34,7 @@ mainPage:createSlider {
 }
 
 mainPage:createSlider {
-    label = string.format("Controls sneak skill increase on a successful snatch for doors.\nDefault - %s\nSkill increase for doors", defaults.sneakSkillIncreaseDoor),
+    label = string.format("Controls Sneak skill increase (progress percentage) on a successful snatch for doors.\nDefault - %s\nSkill increase for doors", defaults.sneakSkillIncreaseDoor),
     min = 0,
     max = 100,
     step = 1,
@@ -43,7 +43,7 @@ mainPage:createSlider {
 }
 
 mainPage:createSlider {
-    label = string.format("Controls sneak skill increase on a successful snatch for all other objects.\nDefault - %s\nSkill increase for other objects", defaults.sneakSkillIncreaseObject),
+    label = string.format("Controls Sneak skill increase (progress percentage) on a successful snatch for all other objects.\nDefault - %s\nSkill increase for other objects", defaults.sneakSkillIncreaseObject),
     min = 0,
     max = 100,
     step = 1,

@@ -4,7 +4,7 @@ description = "A MWSE mod to advance Sneak skill by a MCM-controlled progress pe
 homepage = "https://www.nexusmods.com/morrowind/mods/55369"
 repository = "https://github.com/tewlwolow/Sneaky-Snatcher"
 authors = ["tewlwolow"]
-version = "1.0.0"
+version = "2.0.0"
 
 [tools.mwse]
 lua-mod = "tew.Sneaky Snatcher"

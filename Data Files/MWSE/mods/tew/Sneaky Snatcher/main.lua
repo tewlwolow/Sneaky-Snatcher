@@ -16,25 +16,43 @@ local accessed = true
 ---@type tes3reference[]
 local refs = {}
 
+--- A table to hold our skill increase values for activate targets
+local activateTypes = {
+    [tes3.objectType.container] = config.sneakSkillIncreaseContainer,
+    [tes3.objectType.door] = config.sneakSkillIncreaseDoor,
+}
+
+--- Determine if we have a valid target for our action
+--- @param target tes3reference
+local function isValidTarget(target)
+    return (
+        (
+            not tes3.hasOwnershipAccess { target = target }
+        ) and
+        (
+            (target.object.objectType == tes3.objectType.container and not target.lockNode) or
+            (not target.context)
+        )
+    )
+end
+
 -- Do our thing in the activate event
 --- @param e activateEventData
 local function activateCallback(e)
     local actTarget = e.target
     if (e.activator == tes3.player) and
-        (not playerDetected) and
+        (tes3.mobilePlayer.isSneaking and not playerDetected) and
         (tes3.getSimulationTimestamp(false) - (lastChecked) < 2) and
-        (tes3.mobilePlayer.isSneaking) and
-        (actTarget.object.objectType == tes3.objectType.container and not actTarget.lockNode) and not
-        (tes3.hasOwnershipAccess { target = actTarget }) and
+        (isValidTarget(actTarget)) and
         (
             (not actTarget.tempData.sneakySnatcher) or
             (actTarget.tempData.sneakySnatcher and not actTarget.tempData.sneakySnatcher.accessed)
         ) then
-        accessed = true
         actTarget.tempData.sneakySnatcher = {}
-        actTarget.tempData.sneakySnatcher.accessed = accessed
+        actTarget.tempData.sneakySnatcher.accessed = true
         table.insert(refs, actTarget)
-        tes3.mobilePlayer:exerciseSkill(tes3.skill.sneak, config.sneakSkillIncrease)
+        tes3.mobilePlayer:exerciseSkill(tes3.skill.sneak,
+            activateTypes[actTarget.object.objectType] or config.sneakSkillIncreaseObject)
     end
 end
 event.register(tes3.event.activate, activateCallback)

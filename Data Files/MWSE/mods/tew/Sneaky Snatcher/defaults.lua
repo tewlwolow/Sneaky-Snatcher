@@ -1,3 +1,5 @@
 return {
-    sneakSkillIncrease = 2,
+    sneakSkillIncreaseContainer = 4,
+    sneakSkillIncreaseDoor = 3,
+    sneakSkillIncreaseObject = 2,
 }

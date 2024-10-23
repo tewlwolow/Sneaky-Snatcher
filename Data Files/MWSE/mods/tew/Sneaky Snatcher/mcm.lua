@@ -20,12 +20,30 @@ mainPage:createCategory {
 }
 
 mainPage:createSlider {
-    label = string.format("Controls sneak skill increase on a successful snatch.\nDefault - %s\nSkill increase", defaults.sneakSkillIncrease),
+    label = string.format("Controls sneak skill increase on a successful snatch for containers.\nDefault - %s\nSkill increase", defaults.sneakSkillIncreaseContainer),
     min = 0,
     max = 100,
     step = 1,
     jump = 10,
-    variable = registerVariable("sneakSkillIncrease"),
+    variable = registerVariable("sneakSkillIncreaseContainer"),
+}
+
+mainPage:createSlider {
+    label = string.format("Controls sneak skill increase on a successful snatch for doors.\nDefault - %s\nSkill increase", defaults.sneakSkillIncreaseDoor),
+    min = 0,
+    max = 100,
+    step = 1,
+    jump = 10,
+    variable = registerVariable("sneakSkillIncreaseDoor"),
+}
+
+mainPage:createSlider {
+    label = string.format("Controls sneak skill increase on a successful snatch for all other objects.\nDefault - %s\nSkill increase", defaults.sneakSkillIncreaseObject),
+    min = 0,
+    max = 100,
+    step = 1,
+    jump = 10,
+    variable = registerVariable("sneakSkillIncreaseObject"),
 }
 
 template:saveOnClose(configPath, config)

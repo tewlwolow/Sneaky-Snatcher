@@ -23,7 +23,7 @@ local activateTypes = {
 local function isValidTarget(target)
     return (
         (
-            not tes3.hasOwnershipAccess { target = target }
+            config.useOwnership and tes3.hasOwnershipAccess { target = target } or not config.useOwnership
         ) and
         (
             (target.object.objectType == tes3.objectType.container and not target.lockNode) or

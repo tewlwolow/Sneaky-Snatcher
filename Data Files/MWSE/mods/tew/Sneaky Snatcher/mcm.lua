@@ -19,8 +19,13 @@ mainPage:createCategory {
     label = metadata.package.name .. " " .. metadata.package.version .. " by tewlwolow.\n" .. metadata.package.description .. "\n\nSettings:",
 }
 
+mainPage:createYesNoButton {
+    label = string.format("Cover only objects player has no ownership for?\nDefault - %s", defaults.useOwnership and "Yes" or "No"),
+    variable = registerVariable("useOwnership"),
+}
+
 mainPage:createSlider {
-    label = string.format("Controls sneak skill increase on a successful snatch for containers.\nDefault - %s\nSkill increase", defaults.sneakSkillIncreaseContainer),
+    label = string.format("Controls sneak skill increase on a successful snatch for containers.\nDefault - %s\nSkill increase for containers", defaults.sneakSkillIncreaseContainer),
     min = 0,
     max = 100,
     step = 1,
@@ -29,7 +34,7 @@ mainPage:createSlider {
 }
 
 mainPage:createSlider {
-    label = string.format("Controls sneak skill increase on a successful snatch for doors.\nDefault - %s\nSkill increase", defaults.sneakSkillIncreaseDoor),
+    label = string.format("Controls sneak skill increase on a successful snatch for doors.\nDefault - %s\nSkill increase for doors", defaults.sneakSkillIncreaseDoor),
     min = 0,
     max = 100,
     step = 1,
@@ -38,7 +43,7 @@ mainPage:createSlider {
 }
 
 mainPage:createSlider {
-    label = string.format("Controls sneak skill increase on a successful snatch for all other objects.\nDefault - %s\nSkill increase", defaults.sneakSkillIncreaseObject),
+    label = string.format("Controls sneak skill increase on a successful snatch for all other objects.\nDefault - %s\nSkill increase for other objects", defaults.sneakSkillIncreaseObject),
     min = 0,
     max = 100,
     step = 1,

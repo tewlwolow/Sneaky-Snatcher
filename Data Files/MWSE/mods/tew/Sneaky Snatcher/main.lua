@@ -4,6 +4,7 @@ local metadata = toml.loadMetadata("Sneaky Snatcher")
 local version = metadata.package.version
 local debugLogOn = config.debugLogOn
 
+-- Debug logger
 local function debugLog(message, ...)
     if debugLogOn then
         local info = debug.getinfo(2, "Sl")
@@ -25,17 +26,17 @@ local function debugLog(message, ...)
     end
 end
 
--- A table to track references
+-- Track accessed references
 ---@type tes3reference[]
 local refs = {}
 
---- Skill increase for different object types
+-- Skill increases per object type
 local activateTypes = {
     [tes3.objectType.container] = config.sneakSkillIncreaseContainer,
     [tes3.objectType.door] = config.sneakSkillIncreaseDoor,
 }
 
---- Determine if we have a valid target for our action
+-- Validate target object
 --- @param target tes3reference
 local function isValidTarget(target)
     local ownershipOk = (config.useOwnership and tes3.hasOwnershipAccess { target = target } or not config.useOwnership)
@@ -55,7 +56,7 @@ local function isValidTarget(target)
     return valid
 end
 
---- Get skill multiplier based on distance ratio
+-- Skill multiplier based on distance ratio
 --- @param distance number
 --- @param maxDistance number
 local function getDistanceMultiplier(distance, maxDistance)
@@ -69,7 +70,7 @@ local function getDistanceMultiplier(distance, maxDistance)
     end
 end
 
---- Find the closest detector in the player’s current cell
+-- Find closest detector in current cell
 local function findClosestDetector()
     local closestDistance = nil
     local maxDistance = 0
@@ -110,6 +111,15 @@ local function isPlayerDetected()
     return child and not child.visible
 end
 
+-- Compute scaled gain using distance exponent
+-- distance falloff: steep curve, more gain near 0, rapid dropoff
+local function computeScaledGain(base, distance, maxDistance)
+    local ratio = math.min(distance / maxDistance, 1)
+    local exponent = config.distanceExponent or 2 -- >1 for sharper dropoff
+    local scale = (1 - ratio) ^ exponent          -- <-- note (1 - ratio) ^ exponent
+    return math.ceil(base * scale * getDistanceMultiplier(distance, maxDistance))
+end
+
 -- Activation logic
 --- @param e activateEventData
 local function activateCallback(e)
@@ -136,29 +146,28 @@ local function activateCallback(e)
         return
     end
 
-    -- Optional multiple activation gains
     local accessed = actTarget.tempData.sneakySnatcher and actTarget.tempData.sneakySnatcher.accessed
     if accessed and not config.allowMultipleActivationGains then
         if debugLogOn then debugLog("Rejected: already accessed and multiple activation gains disabled") end
         return
     end
 
+    -- Find closest detector within range
     local closestDistance, maxDistance = findClosestDetector()
     closestDistance = closestDistance or 0
     maxDistance = maxDistance or 1
 
+    -- Compute skill gain
     local baseSkillGain = activateTypes[actTarget.object.objectType] or config.sneakSkillIncreaseObject
-    local multiplier = getDistanceMultiplier(closestDistance, maxDistance)
-    local scaledGain = math.ceil(baseSkillGain * multiplier * (1 - (closestDistance / maxDistance)))
+    local scaledGain = computeScaledGain(baseSkillGain, closestDistance, maxDistance)
 
     if debugLogOn then
         debugLog(
-            "Activate success: %s | closest detector distance=%.2f / max=%.2f | base=%d, multiplier=%.2f, scaled=%d",
+            "Activate success: %s | closest detector distance=%.2f / max=%.2f | base=%d, scaled gain=%d",
             actTarget.object.id,
             closestDistance,
             maxDistance,
             baseSkillGain,
-            multiplier,
             scaledGain
         )
     end
@@ -191,22 +200,22 @@ local function lockPickCallback(e)
         return
     end
 
+    -- Find closest detector within range
     local closestDistance, maxDistance = findClosestDetector()
     closestDistance = closestDistance or 0
     maxDistance = maxDistance or 1
 
+    -- Compute skill gain
     local baseSkillGain = config.sneakSkillIncreaseObject or 1
-    local multiplier = getDistanceMultiplier(closestDistance, maxDistance)
-    local scaledGain = math.ceil(baseSkillGain * multiplier * (1 - (closestDistance / maxDistance)))
+    local scaledGain = computeScaledGain(baseSkillGain, closestDistance, maxDistance)
 
     if debugLogOn then
         debugLog(
-            "Lockpick sneak gain: %s | distance=%.2f / max=%.2f | base=%d, multiplier=%.2f, scaled=%d",
+            "Lockpick sneak gain: %s | distance=%.2f / max=%.2f | base=%d, scaled gain=%d",
             ref.object.id,
             closestDistance,
             maxDistance,
             baseSkillGain,
-            multiplier,
             scaledGain
         )
     end

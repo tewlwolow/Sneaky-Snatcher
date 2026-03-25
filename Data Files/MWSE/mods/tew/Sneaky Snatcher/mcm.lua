@@ -17,6 +17,7 @@ local template = mwse.mcm.createTemplate {
 
 local mainPage = template:createPage { label = "Main Settings", noScroll = true }
 
+-- Description
 mainPage:createCategory {
     label = metadata.package.name .. " " .. metadata.package.version .. " by tewlwolow.\n"
         .. metadata.package.description .. "\n\nSettings:",
@@ -30,7 +31,7 @@ mainPage:createYesNoButton {
     restartRequired = true,
 }
 
--- Existing ownership / skill sliders...
+-- Ownership option
 mainPage:createYesNoButton {
     label = string.format(
         "Cover only objects player has no ownership for?\nDefault - %s",
@@ -39,12 +40,32 @@ mainPage:createYesNoButton {
     variable = registerVariable("useOwnership"),
 }
 
+-- Multiple gains settings
+mainPage:createCategory { label = "Multiple Gains Settings" }
+
+mainPage:createYesNoButton {
+    label = string.format(
+        "Allow multiple activation gains?\nDefault - %s",
+        defaults.allowMultipleActivationGains and "Yes" or "No"
+    ),
+    description = "If enabled, activating the same container/door multiple times can give sneak skill.",
+    variable = registerVariable("allowMultipleActivationGains"),
+}
+
+mainPage:createYesNoButton {
+    label = string.format(
+        "Allow multiple lockpick gains?\nDefault - %s",
+        defaults.allowMultipleLockpickGains and "Yes" or "No"
+    ),
+    description = "If enabled, picking the same lock multiple times can give sneak skill.",
+    variable = registerVariable("allowMultipleLockpickGains"),
+}
+
 -- Progress settings
 mainPage:createCategory { label = "Progress Settings" }
-
 mainPage:createSlider {
     label = string.format(
-        "Controls Sneak skill increase (progress percentage) on a successful snatch for containers.\nDefault - %s\nSkill increase for containers",
+        "Sneak skill increase for containers (progress percentage)\nDefault - %s",
         defaults.sneakSkillIncreaseContainer
     ),
     min = 0,
@@ -56,7 +77,7 @@ mainPage:createSlider {
 
 mainPage:createSlider {
     label = string.format(
-        "Controls Sneak skill increase (progress percentage) on a successful snatch for doors.\nDefault - %s\nSkill increase for doors",
+        "Sneak skill increase for doors (progress percentage)\nDefault - %s",
         defaults.sneakSkillIncreaseDoor
     ),
     min = 0,
@@ -68,7 +89,7 @@ mainPage:createSlider {
 
 mainPage:createSlider {
     label = string.format(
-        "Controls Sneak skill increase (progress percentage) on a successful snatch for all other objects.\nDefault - %s\nSkill increase for other objects",
+        "Sneak skill increase for other objects (progress percentage)\nDefault - %s",
         defaults.sneakSkillIncreaseObject
     ),
     min = 0,
@@ -102,7 +123,7 @@ mainPage:createYesNoButton {
 -- Maximum detection distances
 mainPage:createSlider {
     label = string.format(
-        "Maximum detection distance for NPCs (units).\nDefault - %s",
+        "Maximum detection distance for NPCs (units)\nDefault - %s",
         defaults.npcDetectionDistance
     ),
     min = 256,
@@ -114,7 +135,7 @@ mainPage:createSlider {
 
 mainPage:createSlider {
     label = string.format(
-        "Maximum detection distance for creatures (units).\nDefault - %s",
+        "Maximum detection distance for creatures (units)\nDefault - %s",
         defaults.creatureDetectionDistance
     ),
     min = 256,
@@ -163,28 +184,22 @@ mainPage:createSlider {
     variable = registerVariable("multiplierDefault"),
 }
 
--- Multiple gains settings
-mainPage:createCategory { label = "Multiple Gains Settings" }
+-- Distance exponent
+mainPage:createCategory { label = "Distance Scaling Options" }
 
-mainPage:createYesNoButton {
+mainPage:createSlider {
     label = string.format(
-        "Allow multiple activation gains?\nDefault - %s",
-        defaults.allowMultipleActivationGains and "Yes" or "No"
+        "Distance scaling exponent (affects vertical/far drop-off)\nDefault - %.2f",
+        defaults.distanceExponent
     ),
-    description = "If enabled, activating the same container/door multiple times can give sneak skill.",
-    variable = registerVariable("allowMultipleActivationGains"),
+    min = 1.0,
+    max = 5.0,
+    step = 0.05,
+    jump = 0.1,
+    description = "Higher values make gain drop faster with distance (more vertical sensitivity).",
+    variable = registerVariable("distanceExponent"),
 }
 
-mainPage:createYesNoButton {
-    label = string.format(
-        "Allow multiple lockpick gains?\nDefault - %s",
-        defaults.allowMultipleLockpickGains and "Yes" or "No"
-    ),
-    description = "If enabled, picking the same lock multiple times can give sneak skill.",
-    variable = registerVariable("allowMultipleLockpickGains"),
-}
-
-
-
+-- Save and register
 template:saveOnClose(configPath, config)
 mwse.mcm.register(template)

@@ -102,6 +102,13 @@ local function findClosestDetector()
     return closestDistance, maxDistance
 end
 
+-- UI workaround, because detection logic is fucked
+local function isPlayerDetected()
+    local menu = tes3ui.findMenu(tes3ui.registerID("MenuMulti"))
+    local child = menu:findChild(tes3ui.registerID("MenuMulti_sneak_icon"))
+    return not child.visible
+end
+
 -- Activation logic
 --- @param e activateEventData
 local function activateCallback(e)
@@ -118,7 +125,7 @@ local function activateCallback(e)
         return
     end
 
-    if not tes3.mobilePlayer.isPlayerDetected then
+    if isPlayerDetected() then
         if debugLogOn then debugLog("Rejected: player detected") end
         return
     end

@@ -22,6 +22,7 @@ mainPage:createCategory {
         .. metadata.package.description .. "\n\nSettings:",
 }
 
+-- Existing ownership / skill sliders...
 mainPage:createYesNoButton {
     label = string.format(
         "Cover only objects player has no ownership for?\nDefault - %s",
@@ -66,14 +67,12 @@ mainPage:createSlider {
     variable = registerVariable("sneakSkillIncreaseObject"),
 }
 
--- New category for detection behavior
-mainPage:createCategory {
-    label = "Detection Settings",
-}
+-- Detection settings
+mainPage:createCategory { label = "Detection Settings" }
 
 mainPage:createYesNoButton {
     label = string.format(
-        "Allow NPCs to trigger detection?\nDefault - %s",
+        "Allow NPCs to count for distance checks?\nDefault - %s",
         defaults.npcs and "Yes" or "No"
     ),
     description = "If enabled, NPCs will count toward sneak detection checks.",
@@ -82,13 +81,78 @@ mainPage:createYesNoButton {
 
 mainPage:createYesNoButton {
     label = string.format(
-        "Allow creatures to trigger detection?\nDefault - %s",
+        "Allow creatures to count for distance checks?\nDefault - %s",
         defaults.creatures and "Yes" or "No"
     ),
     description = "If enabled, creatures will count toward sneak detection checks.",
     variable = registerVariable("creatures"),
 }
 
+-- Maximum detection distances
+mainPage:createSlider {
+    label = string.format(
+        "Maximum detection distance for NPCs (units).\nDefault - %s",
+        defaults.npcDetectionDistance
+    ),
+    min = 1024,
+    max = 8192,
+    step = 128,
+    jump = 512,
+    variable = registerVariable("npcDetectionDistance"),
+}
+
+mainPage:createSlider {
+    label = string.format(
+        "Maximum detection distance for creatures (units).\nDefault - %s",
+        defaults.creatureDetectionDistance
+    ),
+    min = 1024,
+    max = 8192,
+    step = 128,
+    jump = 512,
+    variable = registerVariable("creatureDetectionDistance"),
+}
+
+-- Distance-based skill multipliers
+mainPage:createCategory { label = "Distance Skill Multipliers" }
+
+mainPage:createSlider {
+    label = string.format(
+        "Multiplier for very close detectors (<=25%% of max distance)\nDefault - %.2f",
+        defaults.multiplierVeryClose
+    ),
+    min = 1.0,
+    max = 3.0,
+    step = 0.05,
+    jump = 0.1,
+    variable = registerVariable("multiplierVeryClose"),
+}
+
+mainPage:createSlider {
+    label = string.format(
+        "Multiplier for close detectors (<=50%% of max distance)\nDefault - %.2f",
+        defaults.multiplierClose
+    ),
+    min = 1.0,
+    max = 2.0,
+    step = 0.05,
+    jump = 0.1,
+    variable = registerVariable("multiplierClose"),
+}
+
+mainPage:createSlider {
+    label = string.format(
+        "Multiplier for default/far detectors (>50%% of max distance)\nDefault - %.2f",
+        defaults.multiplierDefault
+    ),
+    min = 0.5,
+    max = 1.0,
+    step = 0.05,
+    jump = 0.05,
+    variable = registerVariable("multiplierDefault"),
+}
+
+-- Debug mode
 mainPage:createYesNoButton {
     label = "Enable debug mode?",
     description = "Activates detailed logging for troubleshooting. Requires restart.",

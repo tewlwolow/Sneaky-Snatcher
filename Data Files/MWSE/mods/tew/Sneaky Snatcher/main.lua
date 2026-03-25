@@ -102,11 +102,12 @@ local function findClosestDetector()
     return closestDistance, maxDistance
 end
 
--- UI workaround, because detection logic is fucked
+-- UI workaround for player detection
 local function isPlayerDetected()
     local menu = tes3ui.findMenu(tes3ui.registerID("MenuMulti"))
+    if not menu then return false end
     local child = menu:findChild(tes3ui.registerID("MenuMulti_sneak_icon"))
-    return not child.visible
+    return child and not child.visible
 end
 
 -- Activation logic
@@ -130,51 +131,92 @@ local function activateCallback(e)
         return
     end
 
-    -- Find closest detector within range
-    local closestDistance, maxDistance = findClosestDetector()
-    if not closestDistance then
-        if debugLogOn then debugLog("Rejected: no detectors within range") end
-        return
-    end
-
     if not isValidTarget(actTarget) then
         if debugLogOn then debugLog("Rejected: invalid target") end
         return
     end
 
-    if actTarget.tempData.sneakySnatcher and actTarget.tempData.sneakySnatcher.accessed then
-        if debugLogOn then debugLog("Rejected: already accessed") end
+    -- Optional multiple activation gains
+    local accessed = actTarget.tempData.sneakySnatcher and actTarget.tempData.sneakySnatcher.accessed
+    if accessed and not config.allowMultipleActivationGains then
+        if debugLogOn then debugLog("Rejected: already accessed and multiple activation gains disabled") end
         return
     end
 
-    if debugLogOn then
-        debugLog(
-            "Activate success: %s | closest detector distance=%.2f / max=%.2f",
-            actTarget.object.id,
-            closestDistance,
-            maxDistance
-        )
-    end
+    local closestDistance, maxDistance = findClosestDetector()
+    closestDistance = closestDistance or 0
+    maxDistance = maxDistance or 1
 
-    -- Apply skill gain with distance multiplier
     local baseSkillGain = activateTypes[actTarget.object.objectType] or config.sneakSkillIncreaseObject
     local multiplier = getDistanceMultiplier(closestDistance, maxDistance)
     local scaledGain = math.ceil(baseSkillGain * multiplier * (1 - (closestDistance / maxDistance)))
 
     if debugLogOn then
         debugLog(
-            "Base gain=%d, multiplier=%.2f, scaled gain=%d",
+            "Activate success: %s | closest detector distance=%.2f / max=%.2f | base=%d, multiplier=%.2f, scaled=%d",
+            actTarget.object.id,
+            closestDistance,
+            maxDistance,
             baseSkillGain,
             multiplier,
             scaledGain
         )
     end
 
-    actTarget.tempData.sneakySnatcher = { accessed = true }
+    actTarget.tempData.sneakySnatcher = actTarget.tempData.sneakySnatcher or {}
+    actTarget.tempData.sneakySnatcher.accessed = true
+
     table.insert(refs, actTarget)
     tes3.mobilePlayer:exerciseSkill(tes3.skill.sneak, scaledGain)
 end
 event.register(tes3.event.activate, activateCallback)
+
+-- Lockpick logic
+--- @param e lockPickEventData
+local function lockPickCallback(e)
+    if e.picker ~= tes3.player then return end
+    if not e.lockPresent then return end
+
+    local ref = e.reference
+    if not ref then return end
+
+    if isPlayerDetected() then
+        if debugLogOn then debugLog("Rejected: player detected during lockpick") end
+        return
+    end
+
+    local lockpicked = ref.tempData.sneakySnatcher and ref.tempData.sneakySnatcher.lockpicked
+    if lockpicked and not config.allowMultipleLockpickGains then
+        if debugLogOn then debugLog("Rejected: lock already picked and multiple lockpick gains disabled") end
+        return
+    end
+
+    local closestDistance, maxDistance = findClosestDetector()
+    closestDistance = closestDistance or 0
+    maxDistance = maxDistance or 1
+
+    local baseSkillGain = config.sneakSkillIncreaseObject or 1
+    local multiplier = getDistanceMultiplier(closestDistance, maxDistance)
+    local scaledGain = math.ceil(baseSkillGain * multiplier * (1 - (closestDistance / maxDistance)))
+
+    if debugLogOn then
+        debugLog(
+            "Lockpick sneak gain: %s | distance=%.2f / max=%.2f | base=%d, multiplier=%.2f, scaled=%d",
+            ref.object.id,
+            closestDistance,
+            maxDistance,
+            baseSkillGain,
+            multiplier,
+            scaledGain
+        )
+    end
+
+    ref.tempData.sneakySnatcher = ref.tempData.sneakySnatcher or {}
+    ref.tempData.sneakySnatcher.lockpicked = true
+
+    tes3.mobilePlayer:exerciseSkill(tes3.skill.sneak, scaledGain)
+end
+event.register(tes3.event.lockPick, lockPickCallback)
 
 -- Clear flags and tracker on cell change
 --- @param e cellChangedEventData

@@ -22,6 +22,14 @@ mainPage:createCategory {
         .. metadata.package.description .. "\n\nSettings:",
 }
 
+-- Debug mode
+mainPage:createYesNoButton {
+    label = "Enable debug mode?",
+    description = "Activates detailed logging for troubleshooting. Requires restart.",
+    variable = registerVariable("debugLogOn"),
+    restartRequired = true,
+}
+
 -- Existing ownership / skill sliders...
 mainPage:createYesNoButton {
     label = string.format(
@@ -30,6 +38,9 @@ mainPage:createYesNoButton {
     ),
     variable = registerVariable("useOwnership"),
 }
+
+-- Progress settings
+mainPage:createCategory { label = "Progress Settings" }
 
 mainPage:createSlider {
     label = string.format(
@@ -152,13 +163,28 @@ mainPage:createSlider {
     variable = registerVariable("multiplierDefault"),
 }
 
--- Debug mode
+-- Multiple gains settings
+mainPage:createCategory { label = "Multiple Gains Settings" }
+
 mainPage:createYesNoButton {
-    label = "Enable debug mode?",
-    description = "Activates detailed logging for troubleshooting. Requires restart.",
-    variable = registerVariable("debugLogOn"),
-    restartRequired = true,
+    label = string.format(
+        "Allow multiple activation gains?\nDefault - %s",
+        defaults.allowMultipleActivationGains and "Yes" or "No"
+    ),
+    description = "If enabled, activating the same container/door multiple times can give sneak skill.",
+    variable = registerVariable("allowMultipleActivationGains"),
 }
+
+mainPage:createYesNoButton {
+    label = string.format(
+        "Allow multiple lockpick gains?\nDefault - %s",
+        defaults.allowMultipleLockpickGains and "Yes" or "No"
+    ),
+    description = "If enabled, picking the same lock multiple times can give sneak skill.",
+    variable = registerVariable("allowMultipleLockpickGains"),
+}
+
+
 
 template:saveOnClose(configPath, config)
 mwse.mcm.register(template)

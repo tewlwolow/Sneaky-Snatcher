@@ -194,8 +194,8 @@ mainPage:createSlider {
     ),
     min = 1.0,
     max = 5.0,
-    step = 0.05,
-    jump = 0.1,
+    step = 0.5,
+    jump = 1,
     description = "Higher values make gain drop faster with distance (more vertical sensitivity).",
     variable = registerVariable("distanceExponent"),
 }

@@ -70,10 +70,19 @@ local function getDistanceMultiplier(distance, maxDistance)
     end
 end
 
--- Find closest detector in current cell
-local function findClosestDetector()
+-- UI workaround for player detection
+local function isPlayerDetected()
+    local menu = tes3ui.findMenu(tes3ui.registerID("MenuMulti"))
+    if not menu then return false end
+    local child = menu:findChild(tes3ui.registerID("MenuMulti_sneak_icon"))
+    return child and not child.visible
+end
+
+-- Find closest detector and count all detectors in range
+local function analyzeDetectors()
     local closestDistance = nil
     local maxDistance = 0
+    local count = 0
     local playerPos = tes3.player.position
     local cell = tes3.getPlayerCell()
 
@@ -92,6 +101,7 @@ local function findClosestDetector()
                 or isCreature and (config.creatureDetectionDistance or 2048)
 
             if distance <= detectorMax then
+                count = count + 1
                 if not closestDistance or distance < closestDistance then
                     closestDistance = distance
                     maxDistance = detectorMax
@@ -100,24 +110,20 @@ local function findClosestDetector()
         end
     end
 
-    return closestDistance, maxDistance
+    return closestDistance, maxDistance, count
 end
 
--- UI workaround for player detection
-local function isPlayerDetected()
-    local menu = tes3ui.findMenu(tes3ui.registerID("MenuMulti"))
-    if not menu then return false end
-    local child = menu:findChild(tes3ui.registerID("MenuMulti_sneak_icon"))
-    return child and not child.visible
-end
-
--- Compute scaled gain using distance exponent
--- distance falloff: steep curve, more gain near 0, rapid dropoff
-local function computeScaledGain(base, distance, maxDistance)
+-- Compute scaled gain using distance exponent and detector weight
+-- Distance falloff: steep curve, more gain near 0, rapid dropoff
+local function computeScaledGain(base, distance, maxDistance, detectorCount)
     local ratio = math.min(distance / maxDistance, 1)
     local exponent = config.distanceExponent or 2 -- >1 for sharper dropoff
-    local scale = (1 - ratio) ^ exponent          -- <-- note (1 - ratio) ^ exponent
-    return math.ceil(base * scale * getDistanceMultiplier(distance, maxDistance))
+    local scale = (1 - ratio) ^ exponent
+
+    -- Detector weight: log2 scaling of number of nearby detectors
+    local weightMultiplier = 1 + math.log(detectorCount + 1, 2)
+
+    return math.ceil(base * scale * getDistanceMultiplier(distance, maxDistance) * weightMultiplier)
 end
 
 -- Activation logic
@@ -152,21 +158,23 @@ local function activateCallback(e)
         return
     end
 
-    -- Find closest detector within range
-    local closestDistance, maxDistance = findClosestDetector()
+    -- Analyze detectors once
+    local closestDistance, maxDistance, detectorCount = analyzeDetectors()
     closestDistance = closestDistance or 0
     maxDistance = maxDistance or 1
+    detectorCount = detectorCount or 0
 
     -- Compute skill gain
     local baseSkillGain = activateTypes[actTarget.object.objectType] or config.sneakSkillIncreaseObject
-    local scaledGain = computeScaledGain(baseSkillGain, closestDistance, maxDistance)
+    local scaledGain = computeScaledGain(baseSkillGain, closestDistance, maxDistance, detectorCount)
 
     if debugLogOn then
         debugLog(
-            "Activate success: %s | closest detector distance=%.2f / max=%.2f | base=%d, scaled gain=%d",
+            "Activate success: %s | closest detector distance=%.2f / max=%.2f | detectors=%d | base=%d, scaled gain=%d",
             actTarget.object.id,
             closestDistance,
             maxDistance,
+            detectorCount,
             baseSkillGain,
             scaledGain
         )
@@ -200,21 +208,23 @@ local function lockPickCallback(e)
         return
     end
 
-    -- Find closest detector within range
-    local closestDistance, maxDistance = findClosestDetector()
+    -- Analyze detectors once
+    local closestDistance, maxDistance, detectorCount = analyzeDetectors()
     closestDistance = closestDistance or 0
     maxDistance = maxDistance or 1
+    detectorCount = detectorCount or 0
 
     -- Compute skill gain
     local baseSkillGain = config.sneakSkillIncreaseObject or 1
-    local scaledGain = computeScaledGain(baseSkillGain, closestDistance, maxDistance)
+    local scaledGain = computeScaledGain(baseSkillGain, closestDistance, maxDistance, detectorCount)
 
     if debugLogOn then
         debugLog(
-            "Lockpick sneak gain: %s | distance=%.2f / max=%.2f | base=%d, scaled gain=%d",
+            "Lockpick sneak gain: %s | distance=%.2f / max=%.2f | detectors=%d | base=%d, scaled gain=%d",
             ref.object.id,
             closestDistance,
             maxDistance,
+            detectorCount,
             baseSkillGain,
             scaledGain
         )

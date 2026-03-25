@@ -1,8 +1,8 @@
 return {
     -- Sneak skill increases (progress percentage)
-    sneakSkillIncreaseContainer = 4,
+    sneakSkillIncreaseContainer = 2,
     sneakSkillIncreaseDoor = 3,
-    sneakSkillIncreaseObject = 2,
+    sneakSkillIncreaseObject = 1,
 
     -- Ownership option
     useOwnership = false,

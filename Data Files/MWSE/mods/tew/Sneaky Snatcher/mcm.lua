@@ -94,7 +94,7 @@ mainPage:createSlider {
         "Maximum detection distance for NPCs (units).\nDefault - %s",
         defaults.npcDetectionDistance
     ),
-    min = 1024,
+    min = 256,
     max = 8192,
     step = 128,
     jump = 512,
@@ -106,7 +106,7 @@ mainPage:createSlider {
         "Maximum detection distance for creatures (units).\nDefault - %s",
         defaults.creatureDetectionDistance
     ),
-    min = 1024,
+    min = 256,
     max = 8192,
     step = 128,
     jump = 512,

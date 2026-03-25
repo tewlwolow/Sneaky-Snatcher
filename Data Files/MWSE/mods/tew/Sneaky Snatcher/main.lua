@@ -118,6 +118,11 @@ local function activateCallback(e)
         return
     end
 
+    if not tes3.mobilePlayer.isPlayerDetected then
+        if debugLogOn then debugLog("Rejected: player detected") end
+        return
+    end
+
     -- Find closest detector within range
     local closestDistance, maxDistance = findClosestDetector()
     if not closestDistance then
